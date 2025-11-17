@@ -37,7 +37,7 @@ const Auth = () => {
 
       toast({
         title: "Account created!",
-        description: "Welcome to ArtShare. You can now sign in.",
+        description: "Welcome to ArtRift. You can now sign in.",
       });
     } catch (error: any) {
       toast({
@@ -79,7 +79,7 @@ const Auth = () => {
       <Card className="w-full max-w-md border-border">
         <CardHeader className="space-y-1">
           <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            ArtShare
+            ArtRift
           </CardTitle>
           <CardDescription className="text-center">
             Share your creativity with the world
