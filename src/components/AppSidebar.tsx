@@ -47,7 +47,7 @@ export function AppSidebar() {
       <SidebarContent>
         <div className="p-4">
           <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            ArtShare
+            ArtRift
           </h2>
         </div>
         <SidebarGroup>
