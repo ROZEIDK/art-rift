@@ -1,0 +1,129 @@
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Eye, Heart } from "lucide-react";
+import { Link } from "react-router-dom";
+
+interface Artwork {
+  id: string;
+  title: string;
+  description: string | null;
+  image_url: string;
+  created_at: string;
+  profiles: {
+    username: string;
+    avatar_url: string | null;
+  };
+}
+
+const Home = () => {
+  const [artworks, setArtworks] = useState<Artwork[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchFeedArtworks();
+  }, []);
+
+  const fetchFeedArtworks = async () => {
+    try {
+      const { data: artworkData, error } = await supabase
+        .from("artworks")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+
+      // Fetch profiles for each artwork
+      const artworksWithProfiles = await Promise.all(
+        (artworkData || []).map(async (artwork) => {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("username, avatar_url")
+            .eq("id", artwork.user_id)
+            .single();
+
+          return {
+            ...artwork,
+            profiles: profile || { username: "Unknown", avatar_url: null },
+          };
+        })
+      );
+
+      setArtworks(artworksWithProfiles);
+    } catch (error) {
+      console.error("Error fetching artworks:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <p className="text-muted-foreground">Loading feed...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-4xl font-bold mb-2">Your Feed</h1>
+        <p className="text-muted-foreground">Discover amazing artwork from artists around the world</p>
+      </div>
+
+      {artworks.length === 0 ? (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <p className="text-muted-foreground mb-4">No artworks yet. Be the first to share!</p>
+            <Link to="/upload">
+              <Button>Upload Your First Artwork</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {artworks.map((artwork) => (
+            <Card key={artwork.id} className="overflow-hidden group hover:border-primary/50 transition-all">
+              <div className="aspect-square overflow-hidden bg-muted">
+                <img
+                  src={artwork.image_url}
+                  alt={artwork.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              <CardHeader className="space-y-2">
+                <CardTitle className="line-clamp-1">{artwork.title}</CardTitle>
+                {artwork.description && (
+                  <CardDescription className="line-clamp-2">{artwork.description}</CardDescription>
+                )}
+                <div className="flex items-center gap-2 pt-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={artwork.profiles?.avatar_url || undefined} />
+                    <AvatarFallback>{artwork.profiles?.username?.[0]?.toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm text-muted-foreground">{artwork.profiles?.username}</span>
+                </div>
+              </CardHeader>
+              <CardContent className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Eye className="h-4 w-4" />
+                  <span>0</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Heart className="h-4 w-4" />
+                  <span>0</span>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Home;
