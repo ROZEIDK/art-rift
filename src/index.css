@@ -70,3 +70,11 @@ All colors MUST be HSL.
     dosplay: none !important;
   }
 }
+
+@layer base {
+  /* ...the rest of your base...*/
+  #lovable-badge {
+    display: none !important;
+  }
+}
+
