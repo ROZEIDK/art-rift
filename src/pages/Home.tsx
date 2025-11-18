@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Eye, Heart } from "lucide-react";
-import { Link } from "react-router-dom";
 
 interface Artwork {
   id: string;
@@ -87,38 +87,40 @@ const Home = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {artworks.map((artwork) => (
-            <Card key={artwork.id} className="overflow-hidden group hover:border-primary/50 transition-all">
-              <div className="aspect-square overflow-hidden bg-muted">
-                <img
-                  src={artwork.image_url}
-                  alt={artwork.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <CardHeader className="space-y-2">
-                <CardTitle className="line-clamp-1">{artwork.title}</CardTitle>
-                {artwork.description && (
-                  <CardDescription className="line-clamp-2">{artwork.description}</CardDescription>
-                )}
-                <div className="flex items-center gap-2 pt-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={artwork.profiles?.avatar_url || undefined} />
-                    <AvatarFallback>{artwork.profiles?.username?.[0]?.toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                  <span className="text-sm text-muted-foreground">{artwork.profiles?.username}</span>
+            <Link key={artwork.id} to={`/artwork/${artwork.id}`}>
+              <Card className="overflow-hidden group hover:border-primary/50 transition-all cursor-pointer">
+                <div className="aspect-square overflow-hidden bg-muted">
+                  <img
+                    src={artwork.image_url}
+                    alt={artwork.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
                 </div>
-              </CardHeader>
-              <CardContent className="flex items-center gap-4 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <Eye className="h-4 w-4" />
-                  <span>0</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Heart className="h-4 w-4" />
-                  <span>0</span>
-                </div>
-              </CardContent>
-            </Card>
+                <CardHeader className="space-y-2">
+                  <CardTitle className="line-clamp-1">{artwork.title}</CardTitle>
+                  {artwork.description && (
+                    <CardDescription className="line-clamp-2">{artwork.description}</CardDescription>
+                  )}
+                  <div className="flex items-center gap-2 pt-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={artwork.profiles?.avatar_url || undefined} />
+                      <AvatarFallback>{artwork.profiles?.username?.[0]?.toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm text-muted-foreground">{artwork.profiles?.username}</span>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Eye className="h-4 w-4" />
+                    <span>0</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Heart className="h-4 w-4" />
+                    <span>0</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       )}
