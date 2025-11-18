@@ -9,6 +9,8 @@ import Auth from "./pages/Auth";
 import Upload from "./pages/Upload";
 import Profile from "./pages/Profile";
 import Browse from "./pages/Browse";
+import ArtworkDetail from "./pages/ArtworkDetail";
+import UserProfile from "./pages/UserProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +27,8 @@ const App = () => (
           <Route path="/browse" element={<Layout><Browse /></Layout>} />
           <Route path="/upload" element={<Layout><Upload /></Layout>} />
           <Route path="/profile" element={<Layout><Profile /></Layout>} />
+          <Route path="/artwork/:id" element={<Layout><ArtworkDetail /></Layout>} />
+          <Route path="/user/:id" element={<Layout><UserProfile /></Layout>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
