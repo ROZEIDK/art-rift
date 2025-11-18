@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Trash2, ArrowLeft } from "lucide-react";
+import { Heart, Trash2, ArrowLeft, UserPlus, UserMinus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { CommentSection } from "@/components/CommentSection";
 
 interface Artwork {
   id: string;
@@ -34,6 +35,7 @@ const ArtworkDetail = () => {
   const [tags, setTags] = useState<string[]>([]);
   const [isFavorited, setIsFavorited] = useState(false);
   const [favoriteCount, setFavoriteCount] = useState(0);
+  const [isFollowing, setIsFollowing] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -57,6 +59,12 @@ const ArtworkDetail = () => {
       checkIfFavorited();
     }
   }, [currentUserId, id]);
+
+  useEffect(() => {
+    if (currentUserId && artwork) {
+      checkIfFollowing();
+    }
+  }, [currentUserId, artwork]);
 
   const fetchArtwork = async () => {
     try {
@@ -128,6 +136,22 @@ const ArtworkDetail = () => {
     }
   };
 
+  const checkIfFollowing = async () => {
+    if (!artwork) return;
+    try {
+      const { data } = await supabase
+        .from("follows")
+        .select("follower_id")
+        .eq("follower_id", currentUserId)
+        .eq("following_id", artwork.user_id)
+        .maybeSingle();
+
+      setIsFollowing(!!data);
+    } catch (error) {
+      console.error("Error checking follow status:", error);
+    }
+  };
+
   const toggleFavorite = async () => {
     if (!currentUserId) {
       toast({
@@ -161,6 +185,44 @@ const ArtworkDetail = () => {
       toast({
         title: "Error",
         description: "Failed to update favorites",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const toggleFollow = async () => {
+    if (!currentUserId) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to follow artists",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!artwork) return;
+
+    try {
+      if (isFollowing) {
+        await supabase
+          .from("follows")
+          .delete()
+          .eq("follower_id", currentUserId)
+          .eq("following_id", artwork.user_id);
+        setIsFollowing(false);
+        toast({ title: "Unfollowed artist" });
+      } else {
+        await supabase
+          .from("follows")
+          .insert({ follower_id: currentUserId, following_id: artwork.user_id });
+        setIsFollowing(true);
+        toast({ title: "Following artist" });
+      }
+    } catch (error) {
+      console.error("Error toggling follow:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update follow status",
         variant: "destructive",
       });
     }
@@ -265,7 +327,7 @@ const ArtworkDetail = () => {
           </Card>
 
           <Card className="border-border">
-            <CardContent className="p-6">
+            <CardContent className="p-6 space-y-4">
               <Link to={`/user/${profile.id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                 <Avatar className="h-12 w-12">
                   <AvatarImage src={profile.avatar_url || undefined} />
@@ -278,6 +340,26 @@ const ArtworkDetail = () => {
                   <p className="text-sm text-muted-foreground">@{profile.username}</p>
                 </div>
               </Link>
+
+              {!isOwner && currentUserId && (
+                <Button
+                  variant={isFollowing ? "secondary" : "default"}
+                  onClick={toggleFollow}
+                  className="w-full"
+                >
+                  {isFollowing ? (
+                    <>
+                      <UserMinus className="mr-2 h-4 w-4" />
+                      Unfollow
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      Follow
+                    </>
+                  )}
+                </Button>
+              )}
             </CardContent>
           </Card>
 
@@ -296,6 +378,10 @@ const ArtworkDetail = () => {
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      <div className="mt-8">
+        <CommentSection artworkId={id!} />
       </div>
     </div>
   );

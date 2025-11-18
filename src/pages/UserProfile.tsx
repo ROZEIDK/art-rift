@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, UserPlus, UserMinus } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Profile {
   id: string;
@@ -24,15 +25,32 @@ interface Artwork {
 
 const UserProfile = () => {
   const { id } = useParams<{ id: string }>();
+  const { toast } = useToast();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isFollowing, setIsFollowing] = useState(false);
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUserId(user?.id || null);
+    };
+    fetchCurrentUser();
+  }, []);
 
   useEffect(() => {
     if (id) {
       fetchUserData();
     }
   }, [id]);
+
+  useEffect(() => {
+    if (currentUserId && id && currentUserId !== id) {
+      checkIfFollowing();
+    }
+  }, [currentUserId, id]);
 
   const fetchUserData = async () => {
     try {
@@ -60,6 +78,57 @@ const UserProfile = () => {
     }
   };
 
+  const checkIfFollowing = async () => {
+    try {
+      const { data } = await supabase
+        .from("follows")
+        .select("follower_id")
+        .eq("follower_id", currentUserId)
+        .eq("following_id", id)
+        .maybeSingle();
+
+      setIsFollowing(!!data);
+    } catch (error) {
+      console.error("Error checking follow status:", error);
+    }
+  };
+
+  const toggleFollow = async () => {
+    if (!currentUserId) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to follow artists",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      if (isFollowing) {
+        await supabase
+          .from("follows")
+          .delete()
+          .eq("follower_id", currentUserId)
+          .eq("following_id", id);
+        setIsFollowing(false);
+        toast({ title: "Unfollowed artist" });
+      } else {
+        await supabase
+          .from("follows")
+          .insert({ follower_id: currentUserId, following_id: id });
+        setIsFollowing(true);
+        toast({ title: "Following artist" });
+      }
+    } catch (error) {
+      console.error("Error toggling follow:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update follow status",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return <div className="p-6">Loading...</div>;
   }
@@ -80,10 +149,32 @@ const UserProfile = () => {
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-foreground">
-                {profile.display_name || profile.username}
-              </h1>
-              <p className="text-muted-foreground">@{profile.username}</p>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <h1 className="text-3xl font-bold text-foreground">
+                    {profile.display_name || profile.username}
+                  </h1>
+                  <p className="text-muted-foreground">@{profile.username}</p>
+                </div>
+                {currentUserId && currentUserId !== profile.id && (
+                  <Button
+                    variant={isFollowing ? "secondary" : "default"}
+                    onClick={toggleFollow}
+                  >
+                    {isFollowing ? (
+                      <>
+                        <UserMinus className="mr-2 h-4 w-4" />
+                        Unfollow
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus className="mr-2 h-4 w-4" />
+                        Follow
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
               {profile.bio && (
                 <p className="mt-4 text-foreground">{profile.bio}</p>
               )}
