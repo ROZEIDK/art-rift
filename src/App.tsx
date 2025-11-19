@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
+import AuthenticatedLayout from "./components/AuthenticatedLayout";
 import Index from "./pages/Home";
 import Auth from "./pages/Auth";
 import Upload from "./pages/Upload";
@@ -25,8 +26,8 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/" element={<Layout><Index /></Layout>} />
           <Route path="/browse" element={<Layout><Browse /></Layout>} />
-          <Route path="/upload" element={<Layout><Upload /></Layout>} />
-          <Route path="/profile" element={<Layout><Profile /></Layout>} />
+          <Route path="/upload" element={<AuthenticatedLayout><Upload /></AuthenticatedLayout>} />
+          <Route path="/profile" element={<AuthenticatedLayout><Profile /></AuthenticatedLayout>} />
           <Route path="/artwork/:id" element={<Layout><ArtworkDetail /></Layout>} />
           <Route path="/user/:id" element={<Layout><UserProfile /></Layout>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
