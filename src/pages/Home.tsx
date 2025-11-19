@@ -21,18 +21,49 @@ interface Artwork {
 const Home = () => {
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showMatureContent, setShowMatureContent] = useState(false);
 
   useEffect(() => {
+    fetchUserPreference();
     fetchFeedArtworks();
   }, []);
 
+  const fetchUserPreference = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setShowMatureContent(false);
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("show_mature_content")
+        .eq("id", user.id)
+        .single();
+
+      if (profile) {
+        setShowMatureContent(profile.show_mature_content || false);
+      }
+    } catch (error) {
+      console.error("Error fetching user preference:", error);
+    }
+  };
+
   const fetchFeedArtworks = async () => {
     try {
-      const { data: artworkData, error } = await supabase
+      let query = supabase
         .from("artworks")
         .select("*")
         .order("created_at", { ascending: false })
         .limit(20);
+
+      // Filter mature content based on user preference
+      if (!showMatureContent) {
+        query = query.or("mature_content.is.null,mature_content.eq.false");
+      }
+
+      const { data: artworkData, error } = await query;
 
       if (error) throw error;
 

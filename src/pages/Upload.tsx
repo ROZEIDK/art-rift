@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Upload as UploadIcon } from "lucide-react";
@@ -13,6 +14,7 @@ const Upload = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState("");
+  const [matureContent, setMatureContent] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>("");
   const [loading, setLoading] = useState(false);
@@ -70,6 +72,7 @@ const Upload = () => {
           title,
           description,
           image_url: publicUrl,
+          mature_content: matureContent,
         })
         .select()
         .single();
@@ -193,6 +196,20 @@ const Upload = () => {
               <p className="text-sm text-muted-foreground">
                 Add tags to help others discover your artwork
               </p>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="mature"
+                checked={matureContent}
+                onCheckedChange={(checked) => setMatureContent(checked as boolean)}
+              />
+              <Label
+                htmlFor="mature"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+              >
+                Flag as mature content (18+)
+              </Label>
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>

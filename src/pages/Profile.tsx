@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, Heart } from "lucide-react";
 
 interface Profile {
@@ -16,6 +17,7 @@ interface Profile {
   bio: string | null;
   avatar_url: string | null;
   website_url: string | null;
+  show_mature_content: boolean;
 }
 
 interface Artwork {
@@ -88,6 +90,7 @@ const Profile = () => {
           display_name: profile.display_name,
           bio: profile.bio,
           website_url: profile.website_url,
+          show_mature_content: profile.show_mature_content,
         })
         .eq("id", user.id);
 
@@ -178,6 +181,21 @@ const Profile = () => {
                     setProfile({ ...profile, website_url: e.target.value })
                   }
                 />
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="mature"
+                  checked={profile.show_mature_content}
+                  onCheckedChange={(checked) =>
+                    setProfile({ ...profile, show_mature_content: checked as boolean })
+                  }
+                />
+                <Label
+                  htmlFor="mature"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  Show mature content (18+)
+                </Label>
               </div>
               <Button type="submit" disabled={loading}>
                 {loading ? "Saving..." : "Save Changes"}

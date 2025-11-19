@@ -28,14 +28,38 @@ const Browse = () => {
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showMatureContent, setShowMatureContent] = useState(false);
 
   useEffect(() => {
+    fetchUserPreference();
     fetchArtworks();
   }, []);
 
+  const fetchUserPreference = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setShowMatureContent(false);
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("show_mature_content")
+        .eq("id", user.id)
+        .single();
+
+      if (profile) {
+        setShowMatureContent(profile.show_mature_content || false);
+      }
+    } catch (error) {
+      console.error("Error fetching user preference:", error);
+    }
+  };
+
   const fetchArtworks = async () => {
     try {
-      const { data: artworkData, error } = await supabase
+      let query = supabase
         .from("artworks")
         .select(`
           *,
@@ -48,7 +72,12 @@ const Browse = () => {
         .order("created_at", { ascending: false })
         .limit(50);
 
-      if (error) throw error;
+      // Filter mature content based on user preference
+      if (!showMatureContent) {
+        query = query.or("mature_content.is.null,mature_content.eq.false");
+      }
+
+      const { data: artworkData, error } = await query;
 
       // Fetch profiles for each artwork
       const artworksWithProfiles = await Promise.all(
