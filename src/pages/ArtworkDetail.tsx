@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Trash2, ArrowLeft, UserPlus, UserMinus } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Heart, Trash2, ArrowLeft, UserPlus, UserMinus, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CommentSection } from "@/components/CommentSection";
 
@@ -17,6 +18,7 @@ interface Artwork {
   user_id: string;
   created_at: string;
   view_count: number;
+  mature_content: boolean | null;
 }
 
 interface Profile {
@@ -289,6 +291,15 @@ const ArtworkDetail = () => {
           <Card className="border-border">
             <CardContent className="p-6 space-y-4">
               <h1 className="text-3xl font-bold text-foreground">{artwork.title}</h1>
+              
+              {artwork.mature_content && (
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    This artwork has been flagged as mature content (18+)
+                  </AlertDescription>
+                </Alert>
+              )}
               
               {artwork.description && (
                 <p className="text-muted-foreground">{artwork.description}</p>

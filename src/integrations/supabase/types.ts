@@ -172,6 +172,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          show_mature_content: boolean | null
           updated_at: string
           username: string
           website_url: string | null
@@ -182,6 +183,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id: string
+          show_mature_content?: boolean | null
           updated_at?: string
           username: string
           website_url?: string | null
@@ -192,6 +194,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          show_mature_content?: boolean | null
           updated_at?: string
           username?: string
           website_url?: string | null
