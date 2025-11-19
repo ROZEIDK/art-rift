@@ -9,6 +9,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Heart, Trash2, ArrowLeft, UserPlus, UserMinus, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CommentSection } from "@/components/CommentSection";
+import { useUserRole } from "@/hooks/useUserRole";
+import { RoleBadge } from "@/components/RoleBadge";
 
 interface Artwork {
   id: string;
@@ -40,6 +42,7 @@ const ArtworkDetail = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const { roles: artistRoles } = useUserRole(artwork?.user_id);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -346,8 +349,13 @@ const ArtworkDetail = () => {
                     {profile.username.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <div>
-                  <p className="font-semibold text-foreground">{profile.display_name || profile.username}</p>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-semibold text-foreground">{profile.display_name || profile.username}</p>
+                    {artistRoles.filter(r => r !== 'user').map((role) => (
+                      <RoleBadge key={role} role={role} />
+                    ))}
+                  </div>
                   <p className="text-sm text-muted-foreground">@{profile.username}</p>
                 </div>
               </Link>

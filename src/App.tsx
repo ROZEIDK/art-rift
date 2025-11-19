@@ -12,6 +12,7 @@ import Profile from "./pages/Profile";
 import Browse from "./pages/Browse";
 import ArtworkDetail from "./pages/ArtworkDetail";
 import UserProfile from "./pages/UserProfile";
+import DevConsole from "./pages/DevConsole";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/browse" element={<Layout><Browse /></Layout>} />
           <Route path="/upload" element={<AuthenticatedLayout><Upload /></AuthenticatedLayout>} />
           <Route path="/profile" element={<AuthenticatedLayout><Profile /></AuthenticatedLayout>} />
+          <Route path="/dev-console" element={<AuthenticatedLayout><DevConsole /></AuthenticatedLayout>} />
           <Route path="/artwork/:id" element={<Layout><ArtworkDetail /></Layout>} />
           <Route path="/user/:id" element={<Layout><UserProfile /></Layout>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
