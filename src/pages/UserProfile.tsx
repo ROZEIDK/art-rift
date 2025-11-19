@@ -6,6 +6,8 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, UserPlus, UserMinus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useUserRole } from "@/hooks/useUserRole";
+import { RoleBadge } from "@/components/RoleBadge";
 
 interface Profile {
   id: string;
@@ -31,6 +33,7 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
+  const { roles } = useUserRole(id);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -151,9 +154,14 @@ const UserProfile = () => {
             <div className="flex-1">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h1 className="text-3xl font-bold text-foreground">
-                    {profile.display_name || profile.username}
-                  </h1>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h1 className="text-3xl font-bold text-foreground">
+                      {profile.display_name || profile.username}
+                    </h1>
+                    {roles.filter(r => r !== 'user').map((role) => (
+                      <RoleBadge key={role} role={role} />
+                    ))}
+                  </div>
                   <p className="text-muted-foreground">@{profile.username}</p>
                 </div>
                 {currentUserId && currentUserId !== profile.id && (
