@@ -24,7 +24,9 @@ export const useUserRole = (userId?: string) => {
 
         if (error) throw error;
         
-        setRoles((data || []).map((r) => r.role as UserRole));
+        const fetchedRoles = (data || []).map((r) => r.role as UserRole);
+        console.log("Fetched roles for user", userId, ":", fetchedRoles);
+        setRoles(fetchedRoles);
       } catch (error) {
         console.error("Error fetching roles:", error);
         setRoles([]);
