@@ -32,8 +32,11 @@ const Browse = () => {
 
   useEffect(() => {
     fetchUserPreference();
-    fetchArtworks();
   }, []);
+
+  useEffect(() => {
+    fetchArtworks();
+  }, [showMatureContent]);
 
   const fetchUserPreference = async () => {
     try {
