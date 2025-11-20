@@ -10,6 +10,7 @@ import { Shield, Database, Users, Settings } from "lucide-react";
 
 const DevConsole = () => {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [userLoading, setUserLoading] = useState(true);
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalArtworks: 0,
@@ -22,14 +23,16 @@ const DevConsole = () => {
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setCurrentUserId(user?.id || null);
+      setUserLoading(false);
     };
     fetchUser();
   }, []);
 
-  const { isDeveloper, isAdmin, loading } = useUserRole(currentUserId || undefined);
+  const { isDeveloper, isAdmin, loading: rolesLoading } = useUserRole(currentUserId || undefined);
 
   useEffect(() => {
-    if (!loading && !isDeveloper && !isAdmin) {
+    // Only check permissions after both user and roles are loaded
+    if (!userLoading && !rolesLoading && currentUserId && !isDeveloper && !isAdmin) {
       toast({
         variant: "destructive",
         title: "Access Denied",
@@ -37,7 +40,7 @@ const DevConsole = () => {
       });
       navigate("/");
     }
-  }, [isDeveloper, isAdmin, loading, navigate, toast]);
+  }, [isDeveloper, isAdmin, rolesLoading, userLoading, currentUserId, navigate, toast]);
 
   useEffect(() => {
     if (isDeveloper || isAdmin) {
@@ -63,7 +66,7 @@ const DevConsole = () => {
     }
   };
 
-  if (loading) {
+  if (userLoading || rolesLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <p className="text-muted-foreground">Loading...</p>
