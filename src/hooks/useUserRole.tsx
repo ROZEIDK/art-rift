@@ -10,9 +10,11 @@ export const useUserRole = (userId?: string) => {
   useEffect(() => {
     if (!userId) {
       setLoading(false);
+      setRoles([]);
       return;
     }
 
+    setLoading(true);
     const fetchRoles = async () => {
       try {
         const { data, error } = await supabase
