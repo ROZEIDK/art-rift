@@ -1,4 +1,4 @@
-**Artlift**
+**ArtRift**
 
 
 Artrift is a social platform for artists to publish, share, and discover art. Users can follow creators, comment on artwork, favorite pieces, and build their creative profiles.
