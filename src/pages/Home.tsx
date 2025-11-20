@@ -25,8 +25,11 @@ const Home = () => {
 
   useEffect(() => {
     fetchUserPreference();
-    fetchFeedArtworks();
   }, []);
+
+  useEffect(() => {
+    fetchFeedArtworks();
+  }, [showMatureContent]);
 
   const fetchUserPreference = async () => {
     try {
