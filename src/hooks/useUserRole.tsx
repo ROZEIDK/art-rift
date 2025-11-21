@@ -6,11 +6,13 @@ export type UserRole = "user" | "developer" | "moderator" | "admin";
 export const useUserRole = (userId?: string) => {
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     if (!userId) {
       setLoading(false);
       setRoles([]);
+      setInitialized(true);
       return;
     }
 
@@ -32,6 +34,7 @@ export const useUserRole = (userId?: string) => {
         setRoles([]);
       } finally {
         setLoading(false);
+        setInitialized(true);
       }
     };
 
@@ -43,5 +46,5 @@ export const useUserRole = (userId?: string) => {
   const isDeveloper = hasRole("developer");
   const isModerator = hasRole("moderator");
 
-  return { roles, hasRole, isAdmin, isDeveloper, isModerator, loading };
+  return { roles, hasRole, isAdmin, isDeveloper, isModerator, loading: loading || !initialized };
 };
