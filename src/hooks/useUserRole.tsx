@@ -9,14 +9,20 @@ export const useUserRole = (userId?: string) => {
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
+    console.log("useUserRole effect running with userId:", userId);
+    
     if (!userId) {
+      console.log("No userId, setting empty roles");
       setLoading(false);
       setRoles([]);
       setInitialized(true);
       return;
     }
 
+    console.log("Setting loading to true, starting fetch for userId:", userId);
     setLoading(true);
+    setInitialized(false);
+    
     const fetchRoles = async () => {
       try {
         const { data, error } = await supabase
@@ -46,5 +52,8 @@ export const useUserRole = (userId?: string) => {
   const isDeveloper = hasRole("developer");
   const isModerator = hasRole("moderator");
 
-  return { roles, hasRole, isAdmin, isDeveloper, isModerator, loading: loading || !initialized };
+  const finalLoading = loading || !initialized;
+  console.log("useUserRole returning:", { userId, roles, isDeveloper, isAdmin, loading, initialized, finalLoading });
+
+  return { roles, hasRole, isAdmin, isDeveloper, isModerator, loading: finalLoading };
 };

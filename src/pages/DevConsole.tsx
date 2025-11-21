@@ -31,8 +31,18 @@ const DevConsole = () => {
   const { isDeveloper, isAdmin, loading: rolesLoading } = useUserRole(currentUserId || undefined);
 
   useEffect(() => {
+    console.log("DevConsole permission check:", { 
+      userLoading, 
+      rolesLoading, 
+      currentUserId, 
+      isDeveloper, 
+      isAdmin,
+      willDeny: !userLoading && !rolesLoading && currentUserId && !isDeveloper && !isAdmin
+    });
+    
     // Only check permissions after both user and roles are loaded
     if (!userLoading && !rolesLoading && currentUserId && !isDeveloper && !isAdmin) {
+      console.log("ACCESS DENIED - Redirecting to home");
       toast({
         variant: "destructive",
         title: "Access Denied",
