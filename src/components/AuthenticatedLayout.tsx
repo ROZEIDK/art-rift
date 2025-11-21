@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { useDevConsoleShortcut } from "@/hooks/useDevConsoleShortcut";
 import Layout from "./Layout";
 
 interface AuthenticatedLayoutProps {
@@ -12,6 +13,9 @@ const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  
+  // Enable Ctrl+Alt+D shortcut for dev console
+  useDevConsoleShortcut();
 
   useEffect(() => {
     // Check current session
