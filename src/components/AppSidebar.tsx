@@ -1,10 +1,8 @@
-import { Home, Upload, Search, User, LogOut, Shield } from "lucide-react";
+import { Home, Upload, Search, User, LogOut } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useUserRole } from "@/hooks/useUserRole";
-import { useEffect, useState } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -26,18 +24,6 @@ const items = [
 export function AppSidebar() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setCurrentUserId(user?.id || null);
-    };
-    fetchUser();
-  }, []);
-
-  const { isDeveloper, isAdmin } = useUserRole(currentUserId || undefined);
-  const showDevConsole = isDeveloper || isAdmin;
 
   const handleSignOut = async () => {
     try {
@@ -86,27 +72,6 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        {showDevConsole && (
-          <SidebarGroup>
-            <SidebarGroupLabel>Developer</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to="/dev-console"
-                      className="hover:bg-muted transition-colors"
-                      activeClassName="bg-muted text-primary font-medium"
-                    >
-                      <Shield className="mr-2 h-4 w-4" />
-                      <span>Dev Console</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
         <SidebarGroup className="mt-auto">
           <SidebarGroupContent>
             <SidebarMenu>
